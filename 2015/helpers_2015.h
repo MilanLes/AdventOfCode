@@ -28,3 +28,5 @@ void log_err();
 
 void MoveSanta(SantaPosition&);
 
+bool IsOldNiceString(std::string line); // first part
+bool IsNewNiceString(std::string line); // second part

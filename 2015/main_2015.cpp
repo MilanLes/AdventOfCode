@@ -24,6 +24,52 @@ void SantaPosition::Move(char santaDir)
 	}
 }
 
+bool IsOldNiceString(string line)
+{
+	vector<string> forbiddenCombination = {"ab", "cd", "pq", "xy"};
+	int vows = 0;
+	string vowels = "aeiou";
+	bool bDoublet = false;
+	for(size_t strIter = 0; strIter < line.length(); strIter++)
+	{
+		// check for vowels
+		for(char v : vowels)
+			if(line[strIter] == v) vows++;
+
+		string doubleChar = line.substr(strIter, 2);
+		
+		// disqualify forbidden strings
+		for(string forbid : forbiddenCombination)
+			if(doubleChar == forbid) return false;
+
+		if(doubleChar[0] == doubleChar[1])
+			bDoublet = true;
+	}
+	
+	if(bDoublet && vows > 2) return true;
+	
+	return false;
+}
+
+bool IsNewNiceString(string line)
+{
+	bool bHasThreesome = false;
+	bool bHasDoubles = false;
+
+	for(size_t strIter = 0; strIter < line.length() - 1; strIter++)
+	{
+		if(line[strIter] == line[strIter + 2])
+			bHasThreesome = true;
+
+		string doublet = line.substr(strIter, 2);
+
+		if(line.find(doublet, strIter + 2) != string::npos)
+			bHasDoubles = true;
+	}
+
+	return bHasThreesome && bHasDoubles;
+}
+
 void day_1()
 {
 	ifstream input_file;
@@ -145,7 +191,47 @@ void day_3()
 	cout << "Houses with gifts: " << houses.size() << endl;
 }
 
-void day_4();
+void day_4()
+{
+	// use some language with native MD5
+	/* somehing like php
+	<?php
+	$str = "bgvyzdsv";
+	$str_iter = 0;
+	$res_string = '';
+	$str_to_encode = '';
+	while(strcmp(substr($res_string, 0, 6), "000000") != 0)
+	{
+		$str_iter++;
+		$str_to_encode = $str.strval($str_iter);
+		$res_string = md5($str_to_encode);
+	};
+
+	echo $res_string."\t".$str_to_encode."\t".$str_iter."\n";
+	// 000000b1b64bf5eb55aad89986126953        bgvyzdsv1038736     1038736
+	?>
+	*/
+}
+
+void day_5()
+{
+	ifstream input_file;
+	input_file.open("2015_day5_input");
+	string line;
+	int niceStrings = 0;
+
+	// read file line by line
+	while(getline(input_file, line))
+		if(IsNewNiceString(line)) niceStrings++;
+
+	cout << "Nice strings: " << niceStrings << endl;
+	input_file.close();
+}
+
+void day_6()
+{
+	
+}
 
 int main()
 {
@@ -188,6 +274,7 @@ int main()
 		}
 	} while(day_choice != 0);*/
 	
-	day_3();
+	day_6();
+
 	return 0;
 }
