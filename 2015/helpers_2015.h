@@ -30,3 +30,11 @@ void MoveSanta(SantaPosition&);
 
 bool IsOldNiceString(std::string line); // first part
 bool IsNewNiceString(std::string line); // second part
+
+enum LightOperation
+{
+    eTurnOn,
+    eTurnOff,
+    eToggle,
+    eUnknown
+};

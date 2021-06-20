@@ -96,9 +96,9 @@ void day_1()
 		string_iter++;
 	}
 
-	cout << "Floor: " << floor << endl;
+	cout << "Floor (part one): " << floor << endl;
 	// Part two
-	cout << "Basement position: " << basement_position << endl;
+	cout << "Basement position (part two): " << basement_position << endl;
 
 	input_file.close();
 }
@@ -211,6 +211,7 @@ void day_4()
 	// 000000b1b64bf5eb55aad89986126953        bgvyzdsv1038736     1038736
 	?>
 	*/
+	cout << "Solve this day in another lagnuage which has MD5 already implemented!" << endl;
 }
 
 void day_5()
@@ -220,17 +221,230 @@ void day_5()
 	string line;
 	int niceStrings = 0;
 
+	while(getline(input_file, line))
+		if(IsOldNiceString(line)) niceStrings++;
+	cout << "Nice strings (part one): " << niceStrings << endl;
+
+	niceStrings = 0;
+
 	// read file line by line
 	while(getline(input_file, line))
 		if(IsNewNiceString(line)) niceStrings++;
 
-	cout << "Nice strings: " << niceStrings << endl;
+	cout << "Nice strings (part two): " << niceStrings << endl;
 	input_file.close();
 }
 
-void day_6()
+void day_6_1()
 {
+	const int grid_size = 1000;
+	bool grid[grid_size][grid_size] = { false };
 	
+	ifstream input_file;
+	input_file.open("2015_day6_input");
+	string line;
+
+	while(getline(input_file, line))
+	{
+		stringstream lineToParse(line);
+		// turn on 943,30 through 990,907
+		// turn off 674,321 through 793,388
+		// toggle 749,672 through 973,965
+		string tempStr;
+		getline(lineToParse, tempStr, ' ');
+
+		LightOperation lightOp = LightOperation::eUnknown;
+		int startX = -1, startY = -1, endX = -1, endY = -1;
+
+		if(tempStr == "toggle")
+		{
+			lightOp = eToggle;
+		}
+		else if(tempStr == "turn")
+		{
+			getline(lineToParse, tempStr, ' ');
+			if(tempStr == "on")
+			{
+				lightOp = eTurnOn;
+			}
+			else if(tempStr == "off")
+			{
+				lightOp = eTurnOff;
+			}
+			else
+			{
+				log_err("Undefined turn operation detected");
+			}
+		}
+		else
+		{
+			log_err("Undefined light action detected!");
+		}
+		
+		if(lightOp == LightOperation::eUnknown)
+			log_err("Error reading light operation");
+		
+		getline(lineToParse, tempStr, ',');
+		startX = stoi(tempStr);
+		getline(lineToParse, tempStr, ' ');
+		startY = stoi(tempStr);
+
+		getline(lineToParse, tempStr, ' ');
+		if(tempStr != "through")
+			log_err("Through issue!");
+
+		getline(lineToParse, tempStr, ',');
+		endX = stoi(tempStr);
+		getline(lineToParse, tempStr);
+		endY = stoi(tempStr);
+
+		if(startX < 0 || startY < 0 || endX < 0 || endY < 0)
+			log_err("Coordinates error!");
+
+		for(int xIter = startX; xIter <= endX; xIter++)
+			for(int yIter = startY; yIter <= endY; yIter++)
+				if(lightOp == LightOperation::eTurnOn)
+					grid[xIter][yIter] = true;
+				else if(lightOp == LightOperation::eTurnOff)
+					grid[xIter][yIter] = false;
+				else if(lightOp == LightOperation::eToggle)
+					grid[xIter][yIter] = !grid[xIter][yIter];
+				else log_err("wrong stuff going on with grid!");
+	}
+
+	input_file.close();
+
+	// count the lights
+	int lightsOn = 0;
+	for(int x = 0; x < grid_size; x++)
+		for(int y = 0; y < grid_size; y++)
+			if(grid[x][y] == true) lightsOn++;
+
+	cout << "total lights on: " << lightsOn << endl;
+}
+
+void day_6_2()
+{
+	const int grid_size = 1000;
+	int grid[grid_size][grid_size] = { 0 };
+
+	ifstream input_file;
+	input_file.open("2015_day6_input");
+	string line;
+
+	while(getline(input_file, line))
+	{
+		stringstream lineToParse(line);
+		string tempStr;
+		getline(lineToParse, tempStr, ' ');
+
+		LightOperation lightOp = LightOperation::eUnknown;
+		int startX = -1, startY = -1, endX = -1, endY = -1;
+
+		if(tempStr == "toggle")
+		{
+			lightOp = eToggle;
+		}
+		else if(tempStr == "turn")
+		{
+			getline(lineToParse, tempStr, ' ');
+			if(tempStr == "on")
+				lightOp = eTurnOn;
+			else if(tempStr == "off")
+				lightOp = eTurnOff;
+			else
+				log_err("Undefined turn operation detected");
+		}
+		else
+		{
+			log_err("Undefined light action detected!");
+		}
+		
+		if(lightOp == LightOperation::eUnknown)
+			log_err("Error reading light operation");
+		
+		getline(lineToParse, tempStr, ',');
+		startX = stoi(tempStr);
+		getline(lineToParse, tempStr, ' ');
+		startY = stoi(tempStr);
+
+		getline(lineToParse, tempStr, ' ');
+		if(tempStr != "through")
+			log_err("Through issue!");
+
+		getline(lineToParse, tempStr, ',');
+		endX = stoi(tempStr);
+		getline(lineToParse, tempStr);
+		endY = stoi(tempStr);
+
+		if(startX < 0 || startY < 0 || endX < 0 || endY < 0)
+			log_err("Coordinates error!");
+
+		for(int xIter = startX; xIter <= endX; xIter++)
+			for(int yIter = startY; yIter <= endY; yIter++)
+			{
+				if(lightOp == LightOperation::eTurnOn)
+				{	
+					grid[xIter][yIter] += 1;
+				}
+				else if(lightOp == LightOperation::eTurnOff)
+				{
+					if(grid[xIter][yIter] > 0)
+						grid[xIter][yIter] -= 1;
+				}	
+				else if(lightOp == LightOperation::eToggle)
+				{
+					grid[xIter][yIter] += 2;
+				}
+				else log_err("wrong stuff going on with grid!" + lightOp);
+			}
+	}
+
+	input_file.close();
+
+	// count the lights
+	int totalBrightness = 0;
+	for(int x = 0; x < grid_size; x++)
+		for(int y = 0; y < grid_size; y++)
+			totalBrightness += grid[x][y];
+
+	cout << "total brightness: " << totalBrightness << endl;
+}
+
+void day_7()
+{
+	ifstream input_file;
+	input_file.open("2015_day7_input");
+	string line;
+	vector<int> wires;
+	vector<string> sample_input = 
+	{
+		"123 -> x",
+		"456 -> y",
+		"x AND y -> d",
+		"x OR y -> e",
+		"x LSHIFT 2 -> f",
+		"y RSHIFT 2 -> g",
+		"NOT x -> h",
+		"NOT y -> i"
+	};
+	/*
+	d: 72
+	e: 507
+	f: 492
+	g: 114
+	h: 65412
+	i: 65079
+	x: 123
+	y: 456
+	*/
+	//while(getline(input_file, line))
+	for(string line : sample_input)
+	{
+		cout << line << endl;
+	}
+
+	input_file.close();
 }
 
 int main()
@@ -249,7 +463,7 @@ int main()
 		case 3: day_3(); break;
 		case 4: day_4(); break;
 		case 5: day_5(); break;
-		case 6: day_6(); break;
+		case 6: day_6_1(); day_6_2(); break;
 		case 7: day_7(); break;
 		case 8: day_8(); break;
 		case 9: day_9(); break;
@@ -274,7 +488,7 @@ int main()
 		}
 	} while(day_choice != 0);*/
 	
-	day_6();
+	day_7();
 
 	return 0;
 }
